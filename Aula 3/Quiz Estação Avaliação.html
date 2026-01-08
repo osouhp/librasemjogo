@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Quiz – Avaliação Formativa em Libras</title>
+
+<style>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: #ffffff;
+        margin: 0;
+        padding: 0;
+        color: #333;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #f5f5f5;
+        border-radius: 18px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .logo {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .logo img {
+        max-width: 110px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #574595;
+        margin-bottom: 20px;
+    }
+
+    .intro {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 14px;
+        text-align: center;
+    }
+
+    .intro p {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 25px;
+    }
+
+    .question-box {
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 14px;
+        border-left: 6px solid #574595;
+    }
+
+    .question-box p {
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .option {
+        padding: 12px 16px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: #f5f5f5;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: 0.3s;
+    }
+
+    .option:hover {
+        border-color: #e4b026;
+    }
+
+    .option.correct {
+        background: #b5d48e;
+        border-color: #7da35b;
+        cursor: default;
+    }
+
+    .option.wrong {
+        background: #f3c4c4;
+        border-color: #b46a6a;
+        cursor: default;
+    }
+
+    .disabled {
+        pointer-events: none;
+        opacity: 0.85;
+    }
+
+    .feedback {
+        margin-top: 15px;
+        font-weight: 600;
+    }
+
+    .feedback.correct {
+        color: #4f6b2a;
+    }
+
+    .feedback.wrong {
+        color: #7a1f1f;
+    }
+
+    button {
+        margin-top: 25px;
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        background: #574595;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #46357a;
+    }
+
+    .next {
+        display: none;
+    }
+
+    .result {
+        text-align: center;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 14px;
+        font-size: 18px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">
+        <img src="https://i.imgur.com/nSM2Npw.png" alt="Logo">
+    </div>
+
+    <h1>Quiz – Avaliação Formativa em Libras</h1>
+
+    <div id="content"></div>
+    <button id="nextBtn" class="next" onclick="nextQuestion()">Próxima pergunta</button>
+
+</div>
+
+<script>
+const questions = [
+    {
+        q: "O que é avaliação formativa no ensino de Libras?",
+        options: [
+            "Uma prova final para dar nota.",
+            "Um acompanhamento contínuo da aprendizagem.",
+            "Um teste de comparação entre estudantes."
+        ],
+        answer: 1
+    },
+    {
+        q: "Por que a avaliação formativa é importante no ensino de Libras?",
+        options: [
+            "Para classificar os alunos.",
+            "Para acompanhar o progresso e ajustar o ensino.",
+            "Para substituir todas as avaliações."
+        ],
+        answer: 1
+    },
+    {
+        q: "No ensino de Libras, o que deve ser avaliado principalmente?",
+        options: [
+            "A memorização isolada dos sinais.",
+            "O uso da Libras em situações de comunicação.",
+            "A quantidade de sinais aprendidos."
+        ],
+        answer: 1
+    },
+    {
+        q: "Qual instrumento é mais adequado para a avaliação formativa em Libras?",
+        options: [
+            "Prova escrita sem recursos visuais.",
+            "Observação das interações e registros em vídeo.",
+            "Questionário apenas teórico."
+        ],
+        answer: 1
+    },
+    {
+        q: "Como o feedback deve ocorrer na avaliação formativa em Libras?",
+        options: [
+            "Somente no final do semestre.",
+            "De forma contínua e, sempre que possível, em Libras.",
+            "Apenas por meio de notas."
+        ],
+        answer: 1
+    }
+];
+
+let current = 0;
+let score = 0;
+
+function introScreen() {
+    document.getElementById("content").innerHTML = `
+        <div class="intro">
+            <p>
+                Este quiz tem como objetivo verificar sua compreensão sobre a
+                <strong>avaliação formativa no ensino de Libras</strong>.
+            </p>
+            <p>
+                1️⃣ As perguntas aparecerão <strong>uma por vez</strong><br>
+                2️⃣ Ao responder, você verá imediatamente se acertou ou errou<br>
+                3️⃣ Não será possível alterar a resposta<br>
+                4️⃣ Cada acerto vale <strong>1 ponto</strong>
+            </p>
+            <button onclick="startQuiz()">Iniciar Quiz</button>
+        </div>
+    `;
+}
+
+function startQuiz() {
+    current = 0;
+    score = 0;
+    loadQuestion();
+}
+
+function loadQuestion() {
+    const q = questions[current];
+    document.getElementById("content").innerHTML = `
+        <div class="question-box">
+            <p>${current + 1}. ${q.q}</p>
+            ${q.options.map((opt, i) =>
+                `<div class="option" onclick="checkAnswer(this, ${i})">${opt}</div>`
+            ).join("")}
+            <div id="feedback" class="feedback"></div>
+        </div>
+    `;
+}
+
+function checkAnswer(element, index) {
+    const correctIndex = questions[current].answer;
+    const options = document.querySelectorAll(".option");
+    options.forEach(opt => opt.classList.add("disabled"));
+
+    if (index === correctIndex) {
+        element.classList.add("correct");
+        document.getElementById("feedback").innerText = "✔ Resposta correta!";
+        document.getElementById("feedback").className = "feedback correct";
+        score++;
+    } else {
+        element.classList.add("wrong");
+        options[correctIndex].classList.add("correct");
+        document.getElementById("feedback").innerText = "✖ Resposta incorreta.";
+        document.getElementById("feedback").className = "feedback wrong";
+    }
+
+    document.getElementById("nextBtn").style.display = "block";
+}
+
+function nextQuestion() {
+    current++;
+    document.getElementById("nextBtn").style.display = "none";
+
+    if (current < questions.length) {
+        loadQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    document.getElementById("content").innerHTML = `
+        <div class="result">
+            🎉 Quiz concluído!<br><br>
+            <strong>Sua pontuação final:</strong><br>
+            ${score} de ${questions.length} pontos
+        </div>
+    `;
+}
+
+introScreen();
+</script>
+
+</body>
+</html>
